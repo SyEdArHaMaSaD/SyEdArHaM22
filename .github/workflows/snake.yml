@@ -12,26 +12,21 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - name: Generate snake animation
         uses: Platane/snk/svg-only@v3
         with:
           github_user_name: SyEdArHaM22
           outputs: |
-            github-snake.svg
-            github-snake-dark.svg?palette=github-dark
+            dist/github-snake.svg
+            dist/github-snake-dark.svg?palette=github-dark
 
-      - name: Push snake to output branch
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git checkout --orphan output || git checkout output
-          git rm -rf . --ignore-unmatch
-          mv github-snake.svg github-snake-dark.svg ./  2>/dev/null || true
-          git add github-snake.svg github-snake-dark.svg
-          git commit -m "Generate snake animation"
-          git push origin output --force
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push to output branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: output
+          force_orphan: true
+          enable_jekyll: false
+          user_name: 'github-actions[bot]'
+          user_email: '41898282+github-actions[bot]@users.noreply.github.com'
